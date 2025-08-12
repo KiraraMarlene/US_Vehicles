@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 import plotly.express as px
+import plotly.graph_objects as go
 
 # La ruta es relativa, asumiendo que el archivo está en el mismo directorio que app.py
 file_path = 'vehicles_us.csv'
@@ -73,3 +74,52 @@ fig_bar = px.bar(
 
 # Mostrar el gráfico en Streamlit
 st.plotly_chart(fig_bar, use_container_width=True)
+
+# ----------------- Histograma de Condición vs. Año del Modelo -----------------
+st.header('Condición contra año de modelo')
+
+# Selector interactivo para la condición
+conditions = sorted(filtered_data['condition'].unique())
+selected_condition = st.selectbox('Selecciona una condición', conditions)
+
+# Filtrar los datos por la condición seleccionada
+condition_data = filtered_data[filtered_data['condition'] == selected_condition]
+
+# Crear un histograma de los años del modelo
+fig_hist_condition = px.histogram(condition_data, x='model_year',
+                                  title=f'Distribución de años de modelo para vehículos en condición "{selected_condition}"',
+                                  labels={'model_year': 'Año del Modelo'})
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig_hist_condition, use_container_width=True)
+
+# ----------------- Comparación de precios por productor -----------------
+st.header('Comparar precio por productor')
+
+# Selectores para los dos productores a comparar
+manuf_options = sorted(filtered_data['manufacturer'].unique())
+manuf1 = st.selectbox('Selecciona el productor 1', manuf_options, index=0)
+manuf2 = st.selectbox('Selecciona el productor 2', manuf_options, index=1)
+
+# Filtrar los datos para los productores seleccionados
+data_manuf1 = filtered_data[filtered_data['manufacturer'] == manuf1]['price']
+data_manuf2 = filtered_data[filtered_data['manufacturer'] == manuf2]['price']
+
+# Crear el histograma con Plotly Graph Objects para superponer
+fig_comp = go.Figure()
+
+fig_comp.add_trace(go.Histogram(x=data_manuf1, name=manuf1, marker_color='blue'))
+fig_comp.add_trace(go.Histogram(x=data_manuf2, name=manuf2, marker_color='red'))
+
+# Actualizar el diseño del gráfico para superponer las barras
+fig_comp.update_layout(barmode='overlay',
+                       title_text=f'Comparación de precios entre {manuf1} y {manuf2}',
+                       xaxis_title_text='Precio',
+                       yaxis_title_text='Frecuencia',
+                       bargap=0.1)
+
+# Reducir la opacidad para que los histogramas superpuestos sean visibles
+fig_comp.update_traces(opacity=0.75)
+
+# Mostrar el gráfico en Streamlit
+st.plotly_chart(fig_comp, use_container_width=True)
