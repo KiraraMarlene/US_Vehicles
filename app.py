@@ -2,9 +2,8 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-# Ruta donde se encuentra el archivo CSV
-# Reemplaza con la ruta de tu archivo
-file_path = r'D:\Sprint_7\US_Vehicles\vehicles_us.csv'
+# La ruta ahora es relativa, asumiendo que el archivo está en el mismo directorio que app.py
+file_path = 'vehicles_us.csv'
 
 # Leer los datos del archivo CSV en un DataFrame
 car_data = pd.read_csv(file_path)
